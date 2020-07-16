@@ -1,4 +1,4 @@
-#Swagger merger
+# Swagger merger
 
 Merging few swagger yaml files into the one.
 
