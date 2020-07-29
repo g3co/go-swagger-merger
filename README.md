@@ -11,3 +11,5 @@ The command below will merge ``/data/swagger1.yaml`` ``/data/swagger2.yaml`` and
 
 	go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml
 
+
+Attention. The order of the files is important. The next file overwrites the same fields from the previous file.
