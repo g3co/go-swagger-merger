@@ -1,6 +1,10 @@
 # Swagger merger
 
-Merging few swagger yaml files into the one.
+Merging few swagger YAML files into one.
+
+Install Go if you don't have.
+
+	https://golang.org/doc/install
 
 Install the command line tool first.
 
