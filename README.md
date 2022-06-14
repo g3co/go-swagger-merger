@@ -11,7 +11,7 @@ Install the command line tool first.
 	go get github.com/g3co/go-swagger-merger
 
 
-The command below will merge ``/data/swagger1.yaml`` ``/data/swagger2.yaml`` and save result file in the ``/data/swagger.yaml``. The library supports more than two files to merge.
+The command below will merge ``/data/swagger1.yaml`` ``/data/swagger2.yaml`` and save result file in the ``/data/swagger.yaml``. The library supports more than two files to merge. You can add more paths to the list ``/data/swagger3.yaml``, ``/data/swaggerN.yaml``. 
 
 	go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml
 
