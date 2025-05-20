@@ -1,19 +1,39 @@
-# Swagger merger
+# 🧬 Swagger Merger
 
-To merge a few swagger YAML files into one.
+A simple CLI tool to merge multiple Swagger (OpenAPI) YAML files into a single spec.
 
-Install Go if you don't have one.
+### 🚀 Features
 
-	https://golang.org/doc/install
-
-Install the command line tool first.
-
-	go get github.com/g3co/go-swagger-merger
+* Merge two or more Swagger files into one
+* Supports overwrite logic based on file order
+* Ideal for modular API definitions
 
 
-The command below will merge ``/data/swagger1.yaml`` ``/data/swagger2.yaml`` and save result file in the ``/data/swagger.yaml``. The library supports more than two files to merge. You can add more paths to the list ``/data/swagger3.yaml``, ``/data/swaggerN.yaml``. 
+### 🛠️ Installation
 
-	go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml
+Make sure you have [Go installed](https://golang.org/doc/install), then run:
+
+```bash
+go get github.com/g3co/go-swagger-merger
+```
 
 
-Attention. The order of the files is essential, and the following file overwrites the same fields from the previous file.
+### 📦 Usage
+
+Merge two or more Swagger files into one:
+
+```bash
+go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml
+```
+
+You can add as many input files as needed:
+
+```bash
+go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml /data/swagger3.yaml
+```
+
+
+> ⚠️ **Note:** File order matters. Later files will overwrite conflicting fields from earlier ones.
+
+
+Let me know if you'd like badges, usage examples, or Docker support added to the README.
