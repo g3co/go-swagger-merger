@@ -34,6 +34,3 @@ go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml 
 
 
 > ⚠️ **Note:** File order matters. Later files will overwrite conflicting fields from earlier ones.
-
-
-Let me know if you'd like badges, usage examples, or Docker support added to the README.
