@@ -23,13 +23,13 @@ go get github.com/g3co/go-swagger-merger
 Merge two or more Swagger files into one:
 
 ```bash
-go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml
+go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.json
 ```
 
-You can add as many input files as needed:
+You can add as many input files as needed — supported formats include `.yaml`, `.yml`, and `.json`:
 
 ```bash
-go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml /data/swagger3.yaml
+go-swagger-merger -o /data/swagger.json /data/swagger1.yaml /data/swagger2.yaml /data/swagger3.yaml
 ```
 
 
