@@ -1,8 +1,11 @@
 package helpers
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/ghodss/yaml"
 )
@@ -30,8 +33,19 @@ func (m *Merger) AddFile(file string) error {
 	}
 
 	var swaggerMap any
-	if err = yaml.Unmarshal(content, &swaggerMap); err != nil {
-		return err
+
+	fileExt := filepath.Ext(file)
+	switch fileExt {
+	case ".yaml", ".yml":
+		if err = yaml.Unmarshal(content, &swaggerMap); err != nil {
+			return err
+		}
+	case ".json":
+		if err = json.Unmarshal(content, &swaggerMap); err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("unsupported file extension: %s", fileExt)
 	}
 
 	merge(m.Swagger, swaggerMap.(map[string]any))
@@ -58,9 +72,21 @@ func merge(a, b map[string]any) {
 }
 
 func (m *Merger) Save(fileName string) error {
-	res, err := yaml.Marshal(m.Swagger)
-	if err != nil {
-		return err
+	res := []byte{}
+	var err error
+
+	fileExt := filepath.Ext(fileName)
+	switch fileExt {
+	case ".yaml", ".yml":
+		if res, err = yaml.Marshal(m.Swagger); err != nil {
+			return err
+		}
+	case ".json":
+		if res, err = json.Marshal(m.Swagger); err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("unsupported file extension: %s", fileExt)
 	}
 
 	f, err := os.Create(fileName)

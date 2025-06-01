@@ -15,7 +15,7 @@ func TestNewMerger(t *testing.T) {
 	}
 }
 
-func TestMerger_AddFile(t *testing.T) {
+func TestMerger_AddFileYAML(t *testing.T) {
 	merger := NewMerger()
 
 	// Test non-existent file
@@ -115,6 +115,28 @@ paths:
 	}
 	defer os.Remove("test2.yaml")
 
+	// Create second JSON file with overlapping fields
+	content3 := []byte(`{
+		"swagger": "3.0",
+		"info": {
+			"title": "Third API",
+			"version": "3.0"
+		},
+		"paths": {
+			"/test": {
+				"put": {
+					"summary": "Test3 PUT, should be created"
+				}
+			}
+		}
+	}`)
+
+	err = os.WriteFile("test3.json", content3, 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove("test3.json")
+
 	// Add first file
 	err = merger.AddFile("test1.yaml")
 	if err != nil {
@@ -135,34 +157,45 @@ paths:
 		t.Error("Unexpected error adding second file:", err)
 	}
 
+	err = merger.AddFile("test3.json")
+	if err != nil {
+		t.Error("Unexpected error adding third file:", err)
+	}
+
 	// Verify second file overwrote fields
 	if merger.Swagger["swagger"] != "3.0" {
 		t.Error("Expected swagger version to be overwritten to 3.0")
 	}
-	if merger.Swagger["info"].(map[string]interface{})["title"] != "Second API" {
-		t.Error("Expected title to be overwritten by second file")
+	if merger.Swagger["info"].(map[string]any)["title"] != "Third API" {
+		t.Error("Expected title to be overwritten by third file")
 	}
-	if merger.Swagger["info"].(map[string]interface{})["version"] != "2.0" {
-		t.Error("Expected version to be overwritten to 2.0")
+	if merger.Swagger["info"].(map[string]any)["version"] != "3.0" {
+		t.Error("Expected version to be overwritten to 3.0")
 	}
 
 	// Verify paths were merged
-	paths := merger.Swagger["paths"].(map[string]interface{})
-	testPath := paths["/test2"].(map[string]interface{})
-	post := testPath["post"].(map[string]interface{})
+	paths := merger.Swagger["paths"].(map[string]any)
+	testPath := paths["/test2"].(map[string]any)
+	post := testPath["post"].(map[string]any)
 	if post["summary"] != "Test2 POST, should overwrite first file" {
 		t.Error("Expected test endpoint summary to be overwritten")
 	}
 
-	testPath = paths["/test"].(map[string]interface{})
-	get := testPath["get"].(map[string]interface{})
+	testPath = paths["/test"].(map[string]any)
+	get := testPath["get"].(map[string]any)
 	if get["summary"] != "Test1 GET" {
 		t.Error("Expected test endpoint summary to be overwritten")
 	}
 
-	testPath = paths["/test"].(map[string]interface{})
-	post = testPath["post"].(map[string]interface{})
+	testPath = paths["/test"].(map[string]any)
+	post = testPath["post"].(map[string]any)
 	if post["summary"] != "Test2 POST, should be created, should not overwrite first file" {
 		t.Error("Expected test endpoint summary to be overwritten")
+	}
+
+	testPath = paths["/test"].(map[string]any)
+	put := testPath["put"].(map[string]any)
+	if put["summary"] != "Test3 PUT, should be created" {
+		t.Error("Expected test endpoint summary to be created")
 	}
 }

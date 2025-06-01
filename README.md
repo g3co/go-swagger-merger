@@ -1,6 +1,6 @@
 # 🧬 Swagger Merger
 
-A simple CLI tool to merge multiple Swagger (OpenAPI) YAML files into a single spec.
+A simple CLI tool to merge multiple Swagger (OpenAPI) YAML and JSON files into a single spec.
 
 ### 🚀 Features
 
