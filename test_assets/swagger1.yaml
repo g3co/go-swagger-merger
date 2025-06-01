@@ -1,0 +1,73 @@
+info:
+  title: Swagger1
+  version: 1.0.0
+consumes:
+  - application/json
+produces:
+  - application/json
+swagger: '2.0'
+securityDefinitions:
+  keystone:
+    description: Swagger Merger Test
+    type: apiKey
+    in: header
+    name: x-auth-token
+
+security: []
+
+paths:
+  /api/v1/servers/:
+    get:
+      operationId: ListServers
+      summary: List available servers
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Server'
+      security:
+        - keystone: []
+    post:
+      operationId: CreateServer
+      summary: Create a server
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Server'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Server'
+      security:
+        - keystone: []
+  /api/v1/clusters/:
+    get:
+      operationId: ListClusters
+      summary: List available clusters
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Cluster'
+      security:
+        - keystone: []
+
+definitions:
+  Cluster:
+    type: object
+    properties:
+      name:
+        description: name of the cluster
+        type: string
+  Server:
+    properties:
+      name:
+        description: name of the server
+        type: string

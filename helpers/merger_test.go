@@ -82,7 +82,10 @@ info:
 paths:
   /test:
     get:
-      summary: Test endpoint 1
+      summary: Test1 GET
+  /test2:
+    post:
+      summary: Test1 POST
 `)
 
 	err := os.WriteFile("test1.yaml", content1, 0644)
@@ -99,8 +102,11 @@ info:
   version: "2.0"
 paths:
   /test:
-    get:
-      summary: Test endpoint 2
+    post:
+      summary: Test2 POST, should be created, should not overwrite first file
+  /test2:
+    post:
+      summary: Test2 POST, should overwrite first file
 `)
 
 	err = os.WriteFile("test2.yaml", content2, 0644)
@@ -119,7 +125,7 @@ paths:
 	if merger.Swagger["swagger"] != "2.0" {
 		t.Error("Expected swagger version 2.0 from first file")
 	}
-	if merger.Swagger["info"].(map[string]interface{})["title"] != "First API" {
+	if merger.Swagger["info"].(map[string]any)["title"] != "First API" {
 		t.Error("Expected title from first file")
 	}
 
@@ -142,9 +148,9 @@ paths:
 
 	// Verify paths were merged
 	paths := merger.Swagger["paths"].(map[string]interface{})
-	testPath := paths["/test"].(map[string]interface{})
-	get := testPath["get"].(map[string]interface{})
-	if get["summary"] != "Test endpoint 2" {
+	testPath := paths["/test2"].(map[string]interface{})
+	post := testPath["post"].(map[string]interface{})
+	if post["summary"] != "Test2 POST, should overwrite first file" {
 		t.Error("Expected test endpoint summary to be overwritten")
 	}
 }

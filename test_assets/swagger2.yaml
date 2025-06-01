@@ -1,0 +1,43 @@
+info:
+  title: Swagger2
+  version: 1.0.0
+consumes:
+  - application/json
+produces:
+  - application/json
+swagger: '2.0'
+securityDefinitions:
+  keystone:
+    description: Swagger Merger Test
+    type: apiKey
+    in: header
+    name: x-auth-token
+
+security: []
+
+paths:
+  /api/v1/clusters/:
+    post:
+      operationId: CreateClusterSwagger2
+      summary: Create a cluster
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Cluster'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Cluster'
+      security:
+        - keystone: []
+
+definitions:
+  Cluster:
+    type: object
+    properties:
+      name:
+        description: name of the cluster
+        type: string

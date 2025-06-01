@@ -34,3 +34,9 @@ go-swagger-merger -o /data/swagger.yaml /data/swagger1.yaml /data/swagger2.yaml 
 
 
 > ⚠️ **Note:** File order matters. Later files will overwrite conflicting fields from earlier ones.
+
+
+### 🧪 Quick Test
+
+Test assets are available in the repository to quickly try out the merger
+

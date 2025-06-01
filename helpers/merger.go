@@ -29,35 +29,39 @@ func (m *Merger) AddFile(file string) error {
 		return err
 	}
 
-	var s1 any
-	err = yaml.Unmarshal(content, &s1)
-	if err != nil {
+	var swaggerMap any
+	if err = yaml.Unmarshal(content, &swaggerMap); err != nil {
 		return err
 	}
 
-	return m.merge(s1.(map[string]any))
-}
-
-func (m *Merger) merge(f map[string]any) error {
-	for key, item := range f {
-		if i, ok := item.(map[string]any); ok {
-			for subKey, subitem := range i {
-				if _, ok := m.Swagger[key]; !ok {
-					m.Swagger[key] = map[string]any{}
-				}
-
-				m.Swagger[key].(map[string]any)[subKey] = subitem
-			}
-		} else {
-			m.Swagger[key] = item
-		}
-	}
+	merge(m.Swagger, swaggerMap.(map[string]any))
 
 	return nil
 }
 
+func merge(a, b map[string]any) {
+	if a == nil {
+		return
+	}
+
+	for key, item := range b {
+		if i, ok := item.(map[string]any); ok {
+			if _, ok := a[key]; ok {
+				merge(a[key].(map[string]any), i)
+			} else {
+				a[key] = i
+			}
+		} else {
+			a[key] = item
+		}
+	}
+}
+
 func (m *Merger) Save(fileName string) error {
-	res, _ := yaml.Marshal(m.Swagger)
+	res, err := yaml.Marshal(m.Swagger)
+	if err != nil {
+		return err
+	}
 
 	f, err := os.Create(fileName)
 	if err != nil {
@@ -66,8 +70,7 @@ func (m *Merger) Save(fileName string) error {
 
 	defer f.Close()
 
-	_, err = f.Write(res)
-	if err != nil {
+	if _, err = f.Write(res); err != nil {
 		return err
 	}
 
