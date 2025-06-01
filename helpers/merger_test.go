@@ -3,16 +3,14 @@ package helpers
 import (
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewMerger(t *testing.T) {
 	merger := NewMerger()
-	if merger == nil {
-		t.Error("Expected non-nil merger")
-	}
-	if merger.Swagger == nil {
-		t.Error("Expected non-nil Swagger map")
-	}
+	assert.NotNil(t, merger)
+	assert.NotNil(t, merger.Swagger)
 }
 
 func TestMerger_AddFileYAML(t *testing.T) {
@@ -20,9 +18,7 @@ func TestMerger_AddFileYAML(t *testing.T) {
 
 	// Test non-existent file
 	err := merger.AddFile("nonexistent.yaml")
-	if err == nil {
-		t.Error("Expected error for non-existent file")
-	}
+	assert.Error(t, err)
 
 	// Create a test YAML file
 	content := []byte(`
@@ -36,21 +32,15 @@ paths:
 `)
 
 	err = os.WriteFile("test.yaml", content, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	defer os.Remove("test.yaml")
 
 	// Test valid file
 	err = merger.AddFile("test.yaml")
-	if err != nil {
-		t.Error("Unexpected error:", err)
-	}
+	assert.NoError(t, err)
 
 	// Verify merged content
-	if merger.Swagger["swagger"] != "2.0" {
-		t.Error("Expected swagger version 2.0")
-	}
+	assert.Equal(t, "2.0", merger.Swagger["swagger"])
 }
 
 func TestMerger_Save(t *testing.T) {
@@ -58,16 +48,12 @@ func TestMerger_Save(t *testing.T) {
 	merger.Swagger["test"] = "value"
 
 	err := merger.Save("test_output.yaml")
-	if err != nil {
-		t.Error("Unexpected error:", err)
-	}
+	assert.NoError(t, err)
 	defer os.Remove("test_output.yaml")
 
 	// Verify file was created
 	_, err = os.Stat("test_output.yaml")
-	if err != nil {
-		t.Error("Expected output file to exist")
-	}
+	assert.NoError(t, err)
 }
 
 func TestMerger_MergeMultipleFiles(t *testing.T) {
@@ -89,9 +75,7 @@ paths:
 `)
 
 	err := os.WriteFile("test1.yaml", content1, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	defer os.Remove("test1.yaml")
 
 	// Create second YAML file with overlapping fields
@@ -110,9 +94,7 @@ paths:
 `)
 
 	err = os.WriteFile("test2.yaml", content2, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	defer os.Remove("test2.yaml")
 
 	// Create second JSON file with overlapping fields
@@ -132,70 +114,44 @@ paths:
 	}`)
 
 	err = os.WriteFile("test3.json", content3, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	defer os.Remove("test3.json")
 
 	// Add first file
 	err = merger.AddFile("test1.yaml")
-	if err != nil {
-		t.Error("Unexpected error adding first file:", err)
-	}
+	assert.NoError(t, err)
 
 	// Verify first file content
-	if merger.Swagger["swagger"] != "2.0" {
-		t.Error("Expected swagger version 2.0 from first file")
-	}
-	if merger.Swagger["info"].(map[string]any)["title"] != "First API" {
-		t.Error("Expected title from first file")
-	}
+	assert.Equal(t, "2.0", merger.Swagger["swagger"])
+	assert.Equal(t, "First API", merger.Swagger["info"].(map[string]any)["title"])
 
 	// Add second file
 	err = merger.AddFile("test2.yaml")
-	if err != nil {
-		t.Error("Unexpected error adding second file:", err)
-	}
+	assert.NoError(t, err)
 
 	err = merger.AddFile("test3.json")
-	if err != nil {
-		t.Error("Unexpected error adding third file:", err)
-	}
+	assert.NoError(t, err)
 
 	// Verify second file overwrote fields
-	if merger.Swagger["swagger"] != "3.0" {
-		t.Error("Expected swagger version to be overwritten to 3.0")
-	}
-	if merger.Swagger["info"].(map[string]any)["title"] != "Third API" {
-		t.Error("Expected title to be overwritten by third file")
-	}
-	if merger.Swagger["info"].(map[string]any)["version"] != "3.0" {
-		t.Error("Expected version to be overwritten to 3.0")
-	}
+	assert.Equal(t, "3.0", merger.Swagger["swagger"])
+	assert.Equal(t, "Third API", merger.Swagger["info"].(map[string]any)["title"])
+	assert.Equal(t, "3.0", merger.Swagger["info"].(map[string]any)["version"])
 
 	// Verify paths were merged
 	paths := merger.Swagger["paths"].(map[string]any)
 	testPath := paths["/test2"].(map[string]any)
 	post := testPath["post"].(map[string]any)
-	if post["summary"] != "Test2 POST, should overwrite first file" {
-		t.Error("Expected test endpoint summary to be overwritten")
-	}
+	assert.Equal(t, "Test2 POST, should overwrite first file", post["summary"])
 
 	testPath = paths["/test"].(map[string]any)
 	get := testPath["get"].(map[string]any)
-	if get["summary"] != "Test1 GET" {
-		t.Error("Expected test endpoint summary to be overwritten")
-	}
+	assert.Equal(t, "Test1 GET", get["summary"])
 
 	testPath = paths["/test"].(map[string]any)
 	post = testPath["post"].(map[string]any)
-	if post["summary"] != "Test2 POST, should be created, should not overwrite first file" {
-		t.Error("Expected test endpoint summary to be overwritten")
-	}
+	assert.Equal(t, "Test2 POST, should be created, should not overwrite first file", post["summary"])
 
 	testPath = paths["/test"].(map[string]any)
 	put := testPath["put"].(map[string]any)
-	if put["summary"] != "Test3 PUT, should be created" {
-		t.Error("Expected test endpoint summary to be created")
-	}
+	assert.Equal(t, "Test3 PUT, should be created", put["summary"])
 }
