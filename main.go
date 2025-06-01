@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+
 	"github.com/g3co/go-swagger-merger/helpers"
 )
 
@@ -25,6 +26,3 @@ func main() {
 		panic(err)
 	}
 }
-
-
-

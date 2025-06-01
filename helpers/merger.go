@@ -1,18 +1,19 @@
 package helpers
 
 import (
-	"github.com/ghodss/yaml"
-	"io/ioutil"
+	"io"
 	"os"
+
+	"github.com/ghodss/yaml"
 )
 
 type Merger struct {
-	Swagger map[string]interface{}
+	Swagger map[string]any
 }
 
 func NewMerger() *Merger {
 	merger := new(Merger)
-	merger.Swagger = map[string]interface{}{}
+	merger.Swagger = map[string]any{}
 	return merger
 }
 
@@ -23,29 +24,29 @@ func (m *Merger) AddFile(file string) error {
 	}
 	defer f.Close()
 
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return err
 	}
 
-	var s1 interface{}
+	var s1 any
 	err = yaml.Unmarshal(content, &s1)
 	if err != nil {
 		return err
 	}
 
-	return m.merge(s1.(map[string]interface{}))
+	return m.merge(s1.(map[string]any))
 }
 
-func (m *Merger) merge(f map[string]interface{}) error {
+func (m *Merger) merge(f map[string]any) error {
 	for key, item := range f {
-		if i, ok := item.(map[string]interface{}); ok {
+		if i, ok := item.(map[string]any); ok {
 			for subKey, subitem := range i {
 				if _, ok := m.Swagger[key]; !ok {
-					m.Swagger[key] = map[string]interface{}{}
+					m.Swagger[key] = map[string]any{}
 				}
 
-				m.Swagger[key].(map[string]interface{})[subKey] = subitem
+				m.Swagger[key].(map[string]any)[subKey] = subitem
 			}
 		} else {
 			m.Swagger[key] = item
