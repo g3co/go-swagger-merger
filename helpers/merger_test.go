@@ -153,4 +153,16 @@ paths:
 	if post["summary"] != "Test2 POST, should overwrite first file" {
 		t.Error("Expected test endpoint summary to be overwritten")
 	}
+
+	testPath = paths["/test"].(map[string]interface{})
+	get := testPath["get"].(map[string]interface{})
+	if get["summary"] != "Test1 GET" {
+		t.Error("Expected test endpoint summary to be overwritten")
+	}
+
+	testPath = paths["/test"].(map[string]interface{})
+	post = testPath["post"].(map[string]interface{})
+	if post["summary"] != "Test2 POST, should be created, should not overwrite first file" {
+		t.Error("Expected test endpoint summary to be overwritten")
+	}
 }
