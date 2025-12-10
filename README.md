@@ -14,9 +14,22 @@ A simple CLI tool to merge multiple Swagger (OpenAPI) YAML and JSON files into a
 Make sure you have [Go installed](https://golang.org/doc/install), then run:
 
 ```bash
-go get github.com/g3co/go-swagger-merger
+go install github.com/g3co/go-swagger-merger
 ```
 
+#### Check twice if Go's binary is included in PATH:
+A. Linux/MacOS
+
+Find ~/.zshrc (MacOS) or ~/.bashrc (Linux) and add following:
+```
+export PATH="$HOME/go/bin:$PATH"
+```
+B. Windows
+
+Although Go installer on Windows automatically adds itself to PATH, in case `go install` is unresolved, add following to Environment Variables (System):
+```
+C:\Program Files\Go\bin
+```
 
 ### 📦 Usage
 
