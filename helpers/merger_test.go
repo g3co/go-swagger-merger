@@ -155,3 +155,38 @@ paths:
 	put := testPath["put"].(map[string]any)
 	assert.Equal(t, "Test3 PUT, should be created", put["summary"])
 }
+
+// Regression test for the v0.3.0 panic reported in issue #2: JSON files
+// containing a raw newline inside a string literal used to parse fine when
+// the merger ran every file through ghodss/yaml, then started panicking
+// once .json files were routed through strict encoding/json.
+func TestMerger_AddFileJSONWithRawNewlineInString(t *testing.T) {
+	merger := NewMerger()
+
+	content := []byte("{\n  \"info\": {\n    \"title\": \"Multi\nline title\"\n  }\n}\n")
+
+	err := os.WriteFile("test_rawnewline.json", content, 0644)
+	assert.NoError(t, err)
+	defer os.Remove("test_rawnewline.json")
+
+	err = merger.AddFile("test_rawnewline.json")
+	assert.NoError(t, err)
+
+	info := merger.Swagger["info"].(map[string]any)
+	assert.Contains(t, info["title"], "Multi")
+	assert.Contains(t, info["title"], "line title")
+}
+
+func TestMerger_AddFileJSONInvalidErrorMentionsFile(t *testing.T) {
+	merger := NewMerger()
+
+	// Truly malformed JSON (unclosed brace) — should still fail, but the
+	// returned error should reference the offending file path.
+	err := os.WriteFile("test_broken.json", []byte("{ \"x\": "), 0644)
+	assert.NoError(t, err)
+	defer os.Remove("test_broken.json")
+
+	err = merger.AddFile("test_broken.json")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "test_broken.json")
+}
